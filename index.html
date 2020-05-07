@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>もう迷わない。</title>
+<meta charset="UTF-8"/>
+</head>
+<body>
+<script>
+let map=[],
+brainMap,x,z,goalX,goalZ,timer,ctx,cont;
+function init(){
+let canvas=document.getElementById("canvas");
+ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+reset();
+}
+function think(){
+brainMap=map.concat();
+brainMap[goalZ][goalX]=-1;
+for(let i=-1;true;i--){
+for(let j=0;j<brainMap.length;j++){
+for(let k=0;k<brainMap[0].length;k++){
+if(brainMap[j][k]==i){
+if(brainMap[j-1][k]==0){
+brainMap[j-1][k]=i-1;
+}
+if(brainMap[j+1][k]==0){
+brainMap[j+1][k]=i-1;
+}
+if(brainMap[j][k-1]==0){
+brainMap[j][k-1]=i-1;
+}
+if(brainMap[j][k+1]==0){
+brainMap[j][k+1]=i-1;
+}
+}
+}
+}
+cont=0;
+for(let j=0;j<brainMap.length;j++){
+if(brainMap[j].indexOf(0)==-1){
+cont++;
+}
+}
+if(cont==brainMap.length){
+break;
+}
+}
+console.log(brainMap);
+}
+onload=init;
+function tick(){
+ctx.fillStyle="#0f9388";
+ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+for(let i=0;i<map.length;i++){
+for(let j=0;j<map[0].length;j++){
+if(map[i][j]==-100){
+ctx.fillStyle="#500006";
+ctx.fillRect(j*30,i*30,30,30);
+}
+}
+}
+ctx.fillStyle="white";
+ctx.fillRect(x*30,z*30,30,30);
+ctx.fillStyle="black";
+ctx.fillRect(goalX*30,goalZ*30,30,30);
+let min=Math.max(brainMap[z-1][x],brainMap[z+1][x],brainMap[z][x-1],brainMap[z][x+1]);
+if(brainMap[z-1][x]==min){
+z--;
+}else if(brainMap[z+1][x]==min){
+z++;
+}else if(brainMap[z][x-1]==min){
+x--;
+}else if(brainMap[z][x+1]==min){
+x++;
+}                                                                                //判断
+if(x==goalX&&z==goalZ){
+reset();
+}
+}
+function makeMaze(size){
+map=[];
+for(let i=0;i<size;i++){
+map[i]=[];
+for(let j=0;j<size;j++){
+if(i==0||i==size-1||j==0||j==size-1){
+map[i][j]=-100;
+}else{
+map[i][j]=0;
+}
+}
+}
+for(i=2;i<size-1;i+=2){
+for(j=2;j<size-1;j+=2){
+map[i][j]=-100;
+let rand=Math.floor(Math.random()*4);
+switch(rand){
+case 0:
+map[i-1][j]=-100;
+break;
+case 1:
+map[i+1][j]=-100;
+break;
+case 2:
+map[i][j-1]=-100;
+break;
+case 3:
+map[i][j+1]=-100;
+break;
+}
+}
+}
+goalX=size-2;
+goalZ=size-2;
+}
+function reset(){
+clearInterval(timer);
+x=1,z=1;
+makeMaze(31);
+timer=setInterval(tick,100);
+think();
+}
+</script>
+<style>
+canvas{
+position:fixed;
+top:0px;
+left:0px;
+}
+</style>
+<canvas id="canvas"></canvas>
+</body>
+</html>
+
